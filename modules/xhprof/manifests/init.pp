@@ -10,13 +10,14 @@ class xhprof (
   }
   package { 'php5-mcrypt':
     ensure  => latest,
-    require => Package['php5-dev']
+    require => Package['php5-dev'],
   }
   exec { 'enable mcrypt':
     path    => [ '/bin/', '/sbin/' , '/usr/bin/', '/usr/sbin/' ],
     command => 'php5enmod mcrypt',
     notify => Service['php5-fpm'],
     require => Package['php5-common'],
+    unless => 'php -m mcrypt'
   }
   exec { 'xhprof install':
     command => 'pecl install xhprof-beta',
@@ -41,6 +42,7 @@ class xhprof (
     command => 'php5enmod mongodb',
     notify => Service['php5-fpm'],
     require => Package['php5-common'],
+    unless => 'php -m mcrypt'
   }
   package { 'php5-mongo':
     ensure  => latest,
@@ -75,6 +77,13 @@ class xhprof (
   file { '/vagrant/xhgui':
     ensure => link,
     target => '/vagrant/extensions/xhprof/xhgui/webroot',
-    notify => Service['nginx'],
+    notify => Service['nginx']
+  }
+  file { '/etc/php5/fpm/conf.d/xhgui.ini':
+    content => template('xhprof/xhgui.ini.erb'),
+    owner   => 'root',
+    group   => 'root',
+    mode    => 0644,
+    notify  => Service['php5-fpm']
   }
 }
