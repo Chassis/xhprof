@@ -86,6 +86,7 @@ class xhprof (
     owner   => 'root',
     group   => 'root',
     mode    => 0644,
-    notify  => Service['php5-fpm']
+    notify  => Service['php5-fpm'],
+    require => Package['php5-fpm']
   }
 }
