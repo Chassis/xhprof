@@ -29,7 +29,7 @@ class xhprof (
 		"/etc/php/${config[php]}/fpm/conf.d/xhprof.ini",
 		"/etc/php/${config[php]}/cli/conf.d/xhprof.ini",
 	]:
-		ensure  => $file,
+		ensure  => file,
 		content => template('xhprof/xhprof.ini.erb'),
 		owner   => 'root',
 		group   => 'root',
