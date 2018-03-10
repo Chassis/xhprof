@@ -22,7 +22,8 @@ class xhprof (
 	exec { 'move module':
 		path    => [ '/bin/', '/sbin/', '/usr/bin/', '/usr/sbin/' ],
 		command => 'cp /tmp/xhprof-sampling-interval/extension/modules/xhprof.so /usr/lib/php/20151012',
-		require => Exec['download xhprof and build it']
+		require => Exec['download xhprof and build it'],
+		unless  => 'test -f /usr/lib/php/20151012/xhprof.so'
 	}
 
 	file { [
