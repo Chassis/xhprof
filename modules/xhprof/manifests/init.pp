@@ -12,7 +12,7 @@ class xhprof (
 		$file = file
 	}
 
-	if ! defined( Package["${config[php]}-dev"] ) {
+	if ! defined( Package["php${config[php]}-dev"] ) {
 		package { "php${config[php]}-dev":
 			ensure  => $package,
 			require => Package["php${config[php]}-fpm"]
