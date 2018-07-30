@@ -1,7 +1,8 @@
 # A Chassis extension that installs XHProf and XHGui
 class xhprof (
   $config,
-  $path = '/vagrant/extensions/xhprof'
+  $path = '/vagrant/extensions/xhprof',
+  $php_version  = $config[php],
 ) {
 
 	if ( ! empty( $config[disabled_extensions] ) and 'chassis/xhprof' in $config[disabled_extensions] ) {
@@ -60,5 +61,22 @@ class xhprof (
 			recurse => true,
 			force   => true
 		}
+	}
+
+	exec { 'install xhgui':
+		path => [ '/bin/', '/sbin/', '/usr/bin/', '/usr/sbin/' ],
+		cwd => '/vagrant/extensions/xhprof/xhgui/',
+		command => 'php install.php',
+		require => [ Package["php$php_version-fpm"] ]
+	}
+
+	package { "php$php_version-mongodb":
+		ensure  => $package,
+		require => [ Package["php$php_version-cli"], Package["php$php_version-fpm"] ],
+		notify  => Service["php$php_version-fpm"]
+	}
+
+		package { "mongodb":
+		ensure  => $package,
 	}
 }
