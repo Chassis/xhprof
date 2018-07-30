@@ -34,7 +34,7 @@ class xhprof (
 	}
 
 	file { [
-			"/etc/php/${config[php]}/fpm/conf.d/xhgui.ini",
+		"/etc/php/${config[php]}/fpm/conf.d/xhgui.ini",
 		"/etc/php/${config[php]}/cli/conf.d/xhgui.ini",
 	]:
 		ensure  => $file,
