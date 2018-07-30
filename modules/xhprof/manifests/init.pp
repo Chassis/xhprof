@@ -33,6 +33,19 @@ class xhprof (
 		notify  => Service["php${config[php]}-fpm"]
 	}
 
+	file { [
+			"/etc/php/${config[php]}/fpm/conf.d/xhgui.ini",
+		"/etc/php/${config[php]}/cli/conf.d/xhgui.ini",
+	]:
+		ensure  => $file,
+		content => template('xhprof/xhgui.ini.erb'),
+		owner   => 'root',
+		group   => 'root',
+		mode    => '0644',
+		require => [ Package["php${config[php]}-fpm"] ],
+		notify  => Service["php${config[php]}-fpm"]
+	}
+
 	if ( latest == $package ) {
 		exec { 'download xhprof and build it':
 			path    => [ '/bin/', '/sbin/', '/usr/bin/', '/usr/sbin/' ],
@@ -76,7 +89,12 @@ class xhprof (
 		notify  => Service["php$php_version-fpm"]
 	}
 
-		package { "mongodb":
+	package { "mongodb":
 		ensure  => $package,
+	}
+
+	file { '/vagrant/extensions/xhprof/xhgui/config/config.php':
+		content => template('xhprof/config.php.erb'),
+		require => Exec['install xhgui']
 	}
 }
