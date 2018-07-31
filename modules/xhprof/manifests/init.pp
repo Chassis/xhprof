@@ -4,7 +4,6 @@ class xhprof (
   $path = '/vagrant/extensions/xhprof',
   $php_version  = $config[php],
 ) {
-
 	if ( ! empty( $config[disabled_extensions] ) and 'chassis/xhprof' in $config[disabled_extensions] ) {
 		$package = absent
 		$file = absent
@@ -70,7 +69,7 @@ class xhprof (
 			'/tmp/xhprof.zip',
 			'/tmp/xhprof-sampling-interval'
 			]:
-			ensure  =>  $file,
+			ensure  => $file,
 			recurse => true,
 			force   => true
 		}
