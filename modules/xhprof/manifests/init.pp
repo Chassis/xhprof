@@ -80,7 +80,8 @@ class xhprof (
 		cwd => '/vagrant/extensions/xhprof/xhgui/',
 		command => 'php install.php',
 		require => [ Package["php$php_version-cli"], Package["php$php_version-fpm"] ],
-		environment => ['HOME=/home/vagrant']
+		environment => ['HOME=/home/vagrant'],
+		logoutput => true
 	}
 
 	package { "php$php_version-mongodb":
