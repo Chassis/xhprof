@@ -90,7 +90,13 @@ class xhprof (
 		path => [ '/bin/', '/sbin/', '/usr/bin/', '/usr/sbin/' ],
 		cwd => '/vagrant/extensions/xhprof/xhgui/',
 		command => 'php install.php',
-		require => [ Package["php$php_version-cli"], Package["php$php_version-fpm"], Package["php$php_version-mongodb"] ],
+		require => [
+			Package["php$php_version-cli"],
+			Package["php$php_version-fpm"],
+			Package["php$php_version-mongodb"],
+			File["/etc/php/${config[php]}/fpm/conf.d/xhprof.ini"],
+			Exec['download xhprof and build it']
+		],
 		environment => ['HOME=/home/vagrant'],
 		logoutput => true
 	}
