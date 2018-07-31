@@ -4,6 +4,18 @@ class xhprof (
 	$path = '/vagrant/extensions/xhprof',
 	$php_version  = $config[php]
 ) {
+
+	$server_lsbdistcodename = downcase($::lsbdistcodename)
+
+	apt::source { 'mongodb-org-4.0':
+	  location    => 'http://repo.mongodb.org/apt/ubuntu',
+	  release     => "${server_lsbdistcodename}/mongodb-org/4.0",
+	  repos       => 'multiverse',
+	  key         => '9DA31620334BD75D9DCB49F368818C72E52529D4',
+	  key_server  => 'keyserver.ubuntu.com',
+	  include_src => false
+	}
+
 	if ( ! empty( $config[disabled_extensions] ) and 'chassis/xhprof' in $config[disabled_extensions] ) {
 		$package = absent
 		$file = absent
@@ -78,7 +90,7 @@ class xhprof (
 		path => [ '/bin/', '/sbin/', '/usr/bin/', '/usr/sbin/' ],
 		cwd => '/vagrant/extensions/xhprof/xhgui/',
 		command => 'php install.php',
-		require => [ Package["php$php_version-cli"], Package["php$php_version-fpm"] ],
+		require => [ Package["php$php_version-cli"], Package["php$php_version-fpm"], Package["php$php_version-mongodb"] ],
 		environment => ['HOME=/home/vagrant'],
 		logoutput => true
 	}
@@ -88,8 +100,9 @@ class xhprof (
 		notify  => Service["php$php_version-fpm"]
 	}
 
-	package { 'mongodb':
+	package { 'mongodb-org':
 		ensure  => $package,
+		require => Apt::Source['mongodb-org-4.0']
 	}
 
 }
