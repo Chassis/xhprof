@@ -80,21 +80,17 @@ class xhprof (
 		path => [ '/bin/', '/sbin/', '/usr/bin/', '/usr/sbin/' ],
 		cwd => '/vagrant/extensions/xhprof/xhgui/',
 		command => 'php install.php',
-		require => [ Package["php$php_version-fpm"] ]
+		require => [ Package["php$php_version-cli"], Package["php$php_version-fpm"] ],
+		environment => ['HOME=/home/vagrant']
 	}
 
 	package { "php$php_version-mongodb":
 		ensure  => $package,
-		require => [ Package["php$php_version-cli"], Package["php$php_version-fpm"] ],
 		notify  => Service["php$php_version-fpm"]
 	}
 
-	package { "mongodb":
+	package { 'mongodb':
 		ensure  => $package,
 	}
 
-	file { '/vagrant/extensions/xhprof/xhgui/config/config.php':
-		content => template('xhprof/config.php.erb'),
-		require => Exec['install xhgui']
-	}
 }
