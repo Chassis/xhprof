@@ -111,4 +111,9 @@ class xhprof (
 		require => Apt::Source['mongodb-org-4.0']
 	}
 
+	service { 'mongod':
+		ensure  => running,
+		require => Package['mongodb-org']
+	}
+
 }
