@@ -33,16 +33,15 @@ class xhprof (
 	}
 
 	file { [
-		"/etc/php/${config[php]}/fpm/conf.d/xhgui.ini",
-		"/etc/php/${config[php]}/cli/conf.d/xhgui.ini",
+		"/vagrant/extensions/xhprof/xhgui/config/config.php",
 	]:
-		ensure  => $file,
-		content => template('xhprof/xhgui.ini.erb'),
-		owner   => 'root',
-		group   => 'root',
-		mode    => '0644',
-		require => [ Package["php${config[php]}-fpm"] ],
-		notify  => Service["php${config[php]}-fpm"]
+	  ensure  => $file,
+	  content => template('xhprof/config.php.erb'),
+	  owner   => 'root',
+	  group   => 'root',
+	  mode    => '0644',
+	  require => [ Package["php${config[php]}-fpm"] ],
+	  notify  => Service["php${config[php]}-fpm"]
 	}
 
 	if ( latest == $package ) {
