@@ -1,8 +1,8 @@
 # A Chassis extension that installs XHProf and XHGui
 class xhprof (
-  $config,
-  $path = '/vagrant/extensions/xhprof',
-  $php_version  = $config[php],
+	$config,
+	$path = '/vagrant/extensions/xhprof',
+	$php_version  = $config[php]
 ) {
 	if ( ! empty( $config[disabled_extensions] ) and 'chassis/xhprof' in $config[disabled_extensions] ) {
 		$package = absent
