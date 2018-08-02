@@ -1,20 +1,9 @@
-# A Chassis extension that installs XHProf and XHGui
+# A Chassis extension that installs XHProf
 class xhprof (
 	$config,
 	$path = '/vagrant/extensions/xhprof',
 	$php_version  = $config[php]
 ) {
-
-	$server_lsbdistcodename = downcase($::lsbdistcodename)
-
-	apt::source { 'mongodb-org-4.0':
-	  location    => 'http://repo.mongodb.org/apt/ubuntu',
-	  release     => "${server_lsbdistcodename}/mongodb-org/4.0",
-	  repos       => 'multiverse',
-	  key         => '9DA31620334BD75D9DCB49F368818C72E52529D4',
-	  key_server  => 'keyserver.ubuntu.com',
-	  include_src => false
-	}
 
 	if ( ! empty( $config[disabled_extensions] ) and 'chassis/xhprof' in $config[disabled_extensions] ) {
 		$package = absent
@@ -44,76 +33,24 @@ class xhprof (
 		notify  => Service["php${config[php]}-fpm"]
 	}
 
-	file { [
-		"/vagrant/extensions/xhprof/xhgui/config/config.php",
-	]:
-	  ensure  => $file,
-	  content => template('xhprof/config.php.erb'),
-	  owner   => 'root',
-	  group   => 'root',
-	  mode    => '0644',
-	  require => [ Package["php${config[php]}-fpm"] ],
-	  notify  => Service["php${config[php]}-fpm"]
-	}
-
 	if ( latest == $package ) {
 		exec { 'download xhprof and build it':
 			path    => [ '/bin/', '/sbin/', '/usr/bin/', '/usr/sbin/' ],
 			command =>
-				'curl -L https://github.com/humanmade/xhprof/archive/sampling-interval.zip > /tmp/xhprof.zip && unzip -o /tmp/xhprof.zip -d /tmp && cd /tmp/xhprof-sampling-interval/extension && phpize && ./configure && make && make install'
-			,
+				'curl -L https://github.com/humanmade/xhprof/archive/sampling-interval.zip > /tmp/xhprof.zip && unzip -o /tmp/xhprof.zip -d /tmp && cd /tmp/xhprof-sampling-interval/extension && phpize && ./configure && make && make install; cp /tmp/xhprof-sampling-interval/extension/modules/xhprof.so /usr/lib/php/20151012',
 			require => [ Package['curl'], Package["php${config[php]}-dev"] ],
 			unless  => 'php -m | grep xhprof',
-		}
-
-		exec { 'move module':
-			path    => [ '/bin/', '/sbin/', '/usr/bin/', '/usr/sbin/' ],
-			command =>
-				'cp /tmp/xhprof-sampling-interval/extension/modules/xhprof.so /usr/lib/php/20151012'
-			,
-			require => Exec['download xhprof and build it'],
-			unless  => 'test -f /usr/lib/php/20151012/xhprof.so'
 		}
 	} else {
 		file { [
 			'/usr/lib/php/20151012/xhprof.so',
 			'/tmp/xhprof.zip',
 			'/tmp/xhprof-sampling-interval'
-			]:
-			ensure  => $file,
-			recurse => true,
-			force   => true
+		]:
+		  ensure  => $file,
+		  recurse => true,
+		  force   => true
 		}
-	}
-
-	exec { 'install xhgui':
-		path => [ '/bin/', '/sbin/', '/usr/bin/', '/usr/sbin/' ],
-		cwd => '/vagrant/extensions/xhprof/xhgui/',
-		command => 'php install.php',
-		require => [
-			Package["php$php_version-cli"],
-			Package["php$php_version-fpm"],
-			Package["php$php_version-mongodb"],
-			File["/etc/php/${config[php]}/fpm/conf.d/xhprof.ini"],
-			Exec['download xhprof and build it']
-		],
-		environment => ['HOME=/home/vagrant'],
-		logoutput => true
-	}
-
-	package { "php$php_version-mongodb":
-		ensure  => $package,
-		notify  => Service["php$php_version-fpm"]
-	}
-
-	package { 'mongodb-org':
-		ensure  => $package,
-		require => Apt::Source['mongodb-org-4.0']
-	}
-
-	service { 'mongod':
-		ensure  => running,
-		require => Package['mongodb-org']
 	}
 
 }
